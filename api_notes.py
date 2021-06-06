@@ -1,7 +1,7 @@
 # This script is intended to define what I would expect an shb api to look like
 # I'll develop the code according to this contract, then delete this script
 
-from singlehyperbenchmark import SHB
+from shb import SHB
 
 env_specific_params = {
     'MountainCar': {
@@ -36,7 +36,7 @@ shb.registerEnvPool(['MountainCar', 'CartPole'])
 # let's allow the ability to use repeated_measures, for instance if they choose to make selectionRuns pretty big
 jobs = shb.iterateJobs(alg='DQN', selectionRuns=3, evalRuns=250, repeated_measures=False)
 
-print(len(jobs)) # => 2 envs * (63 params * 3 runs + 250 runs) = 878
+print(len(jobs))  # => 2 envs * (63 params * 3 runs + 250 runs) = 878
 
 for job in jobs:
     # let's handle generating the correct seeds
@@ -47,8 +47,8 @@ for job in jobs:
     seed = job.seed
 
     # as well as optional specific seeds
-    alg_seed = job.alg_seed # no repeated measures over envs, consistent across algs
-    env_seed = job.env_seed # consistent across algs
+    alg_seed = job.alg_seed  # no repeated measures over envs, consistent across algs
+    env_seed = job.env_seed  # consistent across algs
 
     # get the names of alg/env pair to run
     env = job.env
@@ -56,7 +56,7 @@ for job in jobs:
 
     # we will handle iterating params
     params = job.params
-    print(params) # =>
+    print(params)  # =>
     expected = {
         'alpha': 2**-6,
         'gamma': 0.9,

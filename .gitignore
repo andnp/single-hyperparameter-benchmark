@@ -1,0 +1,17 @@
+# ignore all results folders
+results
+results.broken
+results.tar*
+.tmp/
+plots/
+
+# ignore python caches
+env/
+__pycache__
+*.pyc
+
+# ignore test experiments
+test.json
+
+# ignore editor settings
+.vscode
