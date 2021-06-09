@@ -190,3 +190,54 @@ class SHB:
         storage = self.data[alg]
 
         storage[env_idx, param_idx, run] = result
+
+    def cdfScale(self, env: Union[str, int], data: float):
+        if self.data is None:
+            raise Exception("Can't cdfScale without data")
+
+        if type(env) is str:
+            envs = sorted(self._envs, key=str.casefold)
+            env_idx = envs.index(env)
+
+        else:
+            env_idx = env
+
+        cdfs = np.empty(len(self._algs))
+
+        for i, alg in enumerate(self._algs):
+            env_data = self.data[alg][env_idx]
+            count = np.sum(env_data < data)
+            cdfs[i] = count / (env_data.shape[0] * env_data.shape[1])
+
+        return np.mean(cdfs)
+
+    def pickParameters(self):
+        if self.data is None:
+            raise Exception("Can't pick parameters without data")
+
+        out: Dict[str, Params] = {}
+        envs = sorted(self._envs, key=str.casefold)
+        for alg in self._algs:
+            param_vals = np.zeros(self.data[alg].shape[0:2])
+            for i, env in enumerate(envs):
+                data = self.data[alg][i]
+
+                # take cdfScaling of each run/param combo
+                vf = np.vectorize(lambda x: self.cdfScale(env, x))
+                scaled = vf(data)
+
+                # average over runs
+                scaled = np.mean(scaled, axis=1)
+                param_vals[i] = scaled
+
+            # average over environments
+            param_vals = np.mean(param_vals, axis=0)
+
+            # max over parameters
+            param_idx = int(np.argmax(param_vals))
+
+            # save params
+            _, sweepable, _ = self._algs[alg]
+            out[alg] = getParameterPermutation(sweepable, param_idx)
+
+        return out
