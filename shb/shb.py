@@ -1,20 +1,21 @@
+import numpy as np
 from logging import warn
-from typing import Any, Dict, List, Generator, Optional, Tuple
+from typing import Any, Callable, Dict, List, Generator, Optional, Tuple, Union
 from PyExpUtils.utils.dict import merge
 from PyExpUtils.utils.permute import getParameterPermutation, getNumberOfPermutations
 
 # Type aliases
-Result = Any
 Params = Dict[str, Any]
 AlgDescription = Tuple[str, Params, Dict[str, Params]]
 
 class Job:
-    def __init__(self, idx: int, alg: str, env: str, params: Params, _type: str):
+    def __init__(self, idx: int, alg: str, env: str, params: Params, run: int, _type: str):
         self.seed: int
         self.alg_seed: int
         self.env_seed: int
 
         self.idx = idx
+        self.run = run
 
         self.env = env
         self.alg = alg
@@ -23,8 +24,14 @@ class Job:
 
         self.type = _type
 
-    def record(self, result: Result):
-        pass
+        self._storeData: Callable
+
+    def record(self, result: float):
+        if self.type == 'evaluation':
+            raise Exception("Sorry, don't know how to store evaluation data")
+
+        self._storeData(self.alg, self.env, self.idx, self.run, result)
+
 
 class SHB:
     def __init__(self, selection_runs: int = 3, eval_runs: int = 250, repeated_measures: bool = False, algs: Optional[List[AlgDescription]] = None, envs: Optional[List[str]] = None) -> None:
@@ -38,6 +45,8 @@ class SHB:
         self.repeated_measures = repeated_measures
         self.selection_runs = selection_runs
         self.eval_runs = eval_runs
+
+        self.data: Union[None, Dict[str, np.ndarray]] = None
 
         if repeated_measures and selection_runs < 30:
             warn('Using repeated measures with a small number of runs will result in high bias.')
@@ -83,16 +92,17 @@ class SHB:
                     alg_seed = 0
 
                 for sr in range(self.selection_runs):
-                    for i in range(num_perm):
-                        swept_params = getParameterPermutation(param_sweeps, i)
+                    for idx in range(num_perm):
+                        swept_params = getParameterPermutation(param_sweeps, idx)
                         params = merge(swept_params, env_params)
 
-                        idx = sr * num_perm + i
-                        job = Job(idx, alg, env, params, _type='selection')
+                        job = Job(idx, alg, env, params, sr, _type='selection')
 
                         job.seed = seed
                         job.alg_seed = alg_seed
                         job.env_seed = env_seed
+
+                        job._storeData = self.record
 
                         yield job
 
@@ -130,7 +140,7 @@ class SHB:
                 env_params = per_env.get(env, {})
                 all_params = merge(params, env_params)
                 for run in range(self.eval_runs):
-                    job = Job(run, alg, env, all_params, _type='evaluation')
+                    job = Job(0, alg, env, all_params, run, _type='evaluation')
 
                     job.seed = seed
                     job.alg_seed = alg_seed
@@ -149,5 +159,34 @@ class SHB:
                 # always reset the env seed for each new env
                 env_seed = seed_offset
 
-    def record(self, alg: str, env: str, params: Params, result: Result):
-        pass
+    def _setUpDataStorage(self):
+        if self.data is not None:
+            raise Exception('We have already setup the data storage')
+
+        n_envs = len(self._envs)
+
+        # don't assume each alg has same number of parameters
+        # so use separate storage for each
+        self.data = {}
+
+        for alg in self._algs:
+            _, sweepable, _ = self._algs[alg]
+            n_params = getNumberOfPermutations(sweepable)
+
+            self.data[alg] = np.zeros((n_envs, n_params, self.selection_runs))
+
+        # for type inference purposes
+        return self.data
+
+    def record(self, alg: str, env: str, param_idx: int, run: int, result: float):
+        envs = sorted(self._envs, key=str.casefold)
+
+        env_idx = envs.index(env)
+
+        # if we've not stored any data yet, first initialize some storage
+        if self.data is None:
+            self.data = self._setUpDataStorage()
+
+        storage = self.data[alg]
+
+        storage[env_idx, param_idx, run] = result
