@@ -1,0 +1,14 @@
+{
+    "agent": "Random",
+    "problem": "Cartpole",
+    "max_steps": 200000,
+    "metaParameters": {
+        "environment": {
+            "control_seed": true
+        },
+
+        "experiment": {
+            "cutoff": [500, 1000]
+        }
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "agent": "Random",
+    "problem": "CliffWorld",
+    "max_steps": 200000,
+    "metaParameters": {
+        "environment": {
+            "control_seed": true
+        },
+
+        "experiment": {
+            "cutoff": [50, 100]
+        }
+    }
+}
