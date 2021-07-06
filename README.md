@@ -89,6 +89,5 @@ for job in shb.iterateEvaluationJobs(shb_params):
     # run the experiment (left as an exercise to the reader)
     result = runExperiment(alg, env)
 
-    # save results
-    job.record(result)
+    # TODO: do something with these results
 ```
