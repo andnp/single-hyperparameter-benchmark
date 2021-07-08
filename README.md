@@ -1,5 +1,13 @@
 # Single Hyperparameter Benchmark
 
+## Organization
+**shb/**: We include a small library to (a) demonstrate the ideas presented in the paper and (b) assist in utilizing the benchmark in future experiments.
+We include documentation and example usage both in the code, in `tests/`, and below in this README.
+
+**paper/**: We include the full (research) code repository used to generate the results presented in the paper for reproducibility.
+Relevant documentation for running this code can be found in [paper/README.md](paper/README.md).
+We note that, due to the "research" nature of the code, several extraneous scripts, abstractions, and unnecessary generality can be found in the reproduction code; documenting the journey taken to arrive at the finally proposed benchmark.
+
 ## Example Usage
 
 ```python
