@@ -1,4 +1,4 @@
-# Single Hyperparameter Benchmark
+# Cross-environment Hyperparameter Setting Benchmark
 
 ## Organization
 **shb/**: We include a small library to (a) demonstrate the ideas presented in the paper and (b) assist in utilizing the benchmark in future experiments.
