@@ -9,6 +9,36 @@ Params = Dict[str, Any]
 AlgDescription = Tuple[str, Params, Dict[str, Params]]
 
 class Job:
+    """
+    A data class representing meta-data for a single job: (alg, env, run, hyper-setting)-tuple
+
+    ...
+    Attributes
+    ----------
+    seed : int
+        A global random seed
+    alg_seed : int
+        A random seed for the algorithm specifically
+    env_seed : int
+        A random seed for the environment specifically
+
+    idx : int
+        The parameter combination index (supplied by PyExpUtils)
+    run : int
+        The run number for this particular tuple of (alg, env, hyper-setting)
+
+    params : Dict[str, Any]
+        A dictionary mapping from a hyper name to a single value for that hyper
+
+    type : 'selection' | 'evaluation'
+        A string literal indicating which stage of the SHB is being executed
+
+    Methods
+    -------
+
+    record(data: float) -> None
+        saves a single result of this particular job to the parent `shb` object
+    """
     def __init__(self, idx: int, alg: str, env: str, params: Params, run: int, _type: str):
         self.seed: int
         self.alg_seed: int
