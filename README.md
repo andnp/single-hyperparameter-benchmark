@@ -1,5 +1,7 @@
 # Cross-environment Hyperparameter Setting Benchmark
 
+note: we are in the process of changing the name of the benchmark from SHB -> CHS.
+
 ## Organization
 **shb/**: We include a small library to (a) demonstrate the ideas presented in the paper and (b) assist in utilizing the benchmark in future experiments.
 We include documentation and example usage both in the code, in `tests/`, and below in this README.
