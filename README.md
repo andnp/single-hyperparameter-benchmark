@@ -258,3 +258,13 @@ The `job` api is the same as that provided by `iterateModelSelectionJobs`.
 for job in shb.iterateEvaluationJobs(params):
     # do something with the job
 ```
+
+### Named CHS Instances
+The paper introduces two particular instances of the CHS, the SC-CHS with 6 small discrete action control environments, and the DMC-CHS with 28 large continuous action control environments.
+These are both available to import from this library directly as follows:
+```python
+from SHB import SC_CHS, DMC_CHS
+
+chs = SC_CHS(selection_runs=3, evaluation_runs=250, algs=[...])
+```
+Note that registering additional environments for these objects is disabled.

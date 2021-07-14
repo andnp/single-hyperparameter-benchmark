@@ -12,7 +12,6 @@ class Job:
     """
     A data class representing meta-data for a single job: (alg, env, run, hyper-setting)-tuple
 
-    ...
     Attributes
     ----------
     seed : int
@@ -271,3 +270,25 @@ class SHB:
             out[alg] = getParameterPermutation(sweepable, param_idx)
 
         return out
+
+# --------------------------
+# --- Specific Instances ---
+# --------------------------
+
+class NamedCHS(SHB):
+    def __init__(self, selection_runs: int = 3, eval_runs: int = 250, repeated_measures: bool = False, algs: Optional[List[AlgDescription]] = None) -> None:
+        super().__init__(selection_runs, eval_runs, repeated_measures, algs)
+
+    def registerEnvPool(self, envs: List[str]):
+        raise NotImplementedError('Cannot register new environments to a named instance')
+
+class SC_CHS(NamedCHS):
+    _envs = ['Acrobot', 'Cartpole', 'CliffWorld', 'LunarLander', 'MountainCar', 'PuddleWorld']
+
+class DMC_CHS(NamedCHS):
+    _envs = [
+        'DMAcrobotSwingUp', 'DMAcrobotSwingUpSparse', 'DMBallInCup', 'DMCartPoleBalance', 'DMCartPoleBalanceSparse', 'DMCartPoleSwingUp',
+        'DMCartPoleSwingUpSparse', 'DMCheetah', 'DMFingerSpin', 'DMFingerTurnEasy', 'DMFingerTurnHard', 'DMFishSwim', 'DMFishUpright',
+        'DMHopperHop', 'DMHopperStand', 'DMHumanoidRun', 'DMHumanoidWalk', 'DMManipulatorBringBall', 'DMPendulum', 'DMPointMassEasy',
+        'DMReacherEasy', 'DMReacherHard', 'DMSwimmerSwimmer6', 'DMSwimmerSwimmer15', 'DMWalkerRun', 'DMWalkerStand', 'DMWalkerWalk',
+    ]
